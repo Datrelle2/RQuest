@@ -17,7 +17,7 @@ export async function fetchUserProfile(userId) {
 }
 
 export async function updateUserProfile(userId, { name, email }) {
-  await supabase.from('profiles').update({ name, email }).eq('id', userId)
+  await supabase.from('profiles').upsert({ id: userId, name, email }, { onConflict: 'id' })
 }
 
 export async function fetchSavedChallenges(userId) {
@@ -84,11 +84,11 @@ export async function updateUserPoints(userId, xpEarned) {
     .select('total_xp, completed_count')
     .eq('id', userId)
     .single()
-  if (!profile) return
-  await supabase.from('profiles').update({
-    total_xp: (profile.total_xp || 0) + xpEarned,
-    completed_count: (profile.completed_count || 0) + 1,
-  }).eq('id', userId)
+  await supabase.from('profiles').upsert({
+    id: userId,
+    total_xp: (profile?.total_xp || 0) + xpEarned,
+    completed_count: (profile?.completed_count || 0) + 1,
+  }, { onConflict: 'id' })
 }
 
 export async function deleteChallenge(challengeId) {
