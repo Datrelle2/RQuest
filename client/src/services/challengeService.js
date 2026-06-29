@@ -7,7 +7,13 @@ export async function fetchUserProfile(userId) {
     .eq('id', userId)
     .single()
   if (error) return null
-  return data
+  return {
+    ...data,
+    totalXP:        data.total_xp        ?? 0,
+    completedCount: data.completed_count  ?? 0,
+    categories:     data.categories       ?? [],
+    difficulty:     data.difficulty       ?? 'Mixed',
+  }
 }
 
 export async function updateUserProfile(userId, { name, email }) {
