@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
+import { Component } from 'react'
 import { AppProvider, useApp } from './context/AppContext'
 import Login             from './pages/Login'
 import Register          from './pages/Register'
@@ -8,10 +9,28 @@ import ChallengeHistory  from './pages/ChallengeHistory'
 import CategorySettings  from './pages/CategorySettings'
 import Leaderboard       from './pages/Leaderboard'
 import Profile           from './pages/Profile'
+import ErrorPage         from './pages/ErrorPage'
 
 function Protected({ children }) {
-  const { isAuthenticated } = useApp()
+  const { isAuthenticated, loading } = useApp()
+  if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: 'var(--text-muted)', fontFamily: "'Cinzel',serif", letterSpacing: '0.1em' }}>Loading…</div>
   return isAuthenticated ? children : <Navigate to="/" replace />
+}
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { hasError: false, error: null }
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error }
+  }
+  render() {
+    if (this.state.hasError) {
+      return <ErrorPage error={this.state.error} />
+    }
+    return this.props.children
+  }
 }
 
 function AppRoutes() {
@@ -25,6 +44,7 @@ function AppRoutes() {
       <Route path="/settings"    element={<Protected><CategorySettings /></Protected>} />
       <Route path="/leaderboard" element={<Protected><Leaderboard /></Protected>} />
       <Route path="/profile"     element={<Protected><Profile /></Protected>} />
+      <Route path="/error"       element={<ErrorPage />} />
       <Route path="*"            element={<Navigate to="/" replace />} />
     </Routes>
   )
@@ -34,7 +54,9 @@ export default function App() {
   return (
     <AppProvider>
       <BrowserRouter>
-        <AppRoutes />
+        <ErrorBoundary>
+          <AppRoutes />
+        </ErrorBoundary>
       </BrowserRouter>
     </AppProvider>
   )

@@ -33,14 +33,49 @@ export default function Register() {
   const [showPw, setShowPw]     = useState(false)
   const [showCf, setShowCf]     = useState(false)
   const [error, setError]       = useState('')
+  const [loading, setLoading]   = useState(false)
+  const [confirmed, setConfirmed] = useState(false)
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     setError('')
-    if (password !== confirm) { setError('Passwords do not match.'); return }
-    if (password.length < 8)  { setError('Password too short.'); return }
-    register(name, email, password)
-    navigate('/settings')
+    if (!name.trim())           { setError('Display name is required.'); return }
+    if (!email.trim())          { setError('Email address is required.'); return }
+    if (password !== confirm)   { setError('Passwords do not match.'); return }
+    if (password.length < 8)    { setError('Password must be at least 8 characters.'); return }
+    setLoading(true)
+    const result = await register(name, email, password)
+    setLoading(false)
+    if (result.status === 'ok')      navigate('/settings')
+    else if (result.status === 'confirm') setConfirmed(true)
+    else setError(result.message)
+  }
+
+  if (confirmed) {
+    return (
+      <div style={S.page}>
+        <div style={S.inner}>
+          <div style={S.logoWrap}>
+            <div style={S.logoBox}><DiamondIcon /></div>
+            <div>
+              <div style={S.logoLabel}>Random</div>
+              <div style={S.logoName}>Quest</div>
+            </div>
+          </div>
+          <div style={S.card}>
+            <div style={S.confirmIcon}>✉️</div>
+            <h2 style={{ ...S.heading, fontSize: 20, marginBottom: 10 }}>Check Your Email</h2>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 20 }}>
+              A confirmation link has been sent to <strong style={{ color: 'var(--text)' }}>{email}</strong>.
+              Click the link in that email to activate your account, then sign in.
+            </p>
+            <button className="btn-primary" style={{ width: '100%', padding: '12px' }} onClick={() => navigate('/')}>
+              Go to Sign In
+            </button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -106,10 +141,10 @@ export default function Register() {
               <PasswordReqs pw={password} />
             </div>
 
-            {error && <p style={{ fontSize: 12, color: '#f87171', textAlign: 'center' }}>{error}</p>}
+            {error && <p style={{ fontSize: 12, color: '#f87171', textAlign: 'center', background: 'rgba(248,113,113,.08)', border: '1px solid rgba(248,113,113,.2)', borderRadius: 8, padding: '8px 12px' }}>{error}</p>}
 
-            <button type="submit" className="btn-primary" style={{ width: '100%', padding: '12px', marginTop: 4 }}>
-              <ShieldIcon /> Create Account
+            <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%', padding: '12px', marginTop: 4 }}>
+              {loading ? 'Creating Account…' : <><ShieldIcon /> Create Account</>}
             </button>
           </form>
         </div>
@@ -155,6 +190,7 @@ const S = {
   },
   form: { display: 'flex', flexDirection: 'column', gap: 18 },
   switch: { marginTop: 20, fontSize: 13, color: 'var(--text-muted)' },
+  confirmIcon: { fontSize: 40, textAlign: 'center', marginBottom: 16 },
 }
 
 function DiamondIcon() {

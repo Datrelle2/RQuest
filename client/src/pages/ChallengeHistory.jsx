@@ -2,21 +2,22 @@ import { useState } from 'react'
 import { useApp } from '../context/AppContext'
 import Layout from '../components/Layout'
 
-const FILTERS = ['All', 'Easy', 'Medium', 'Hard', 'Legendary']
+const FILTERS = ['All', 'Easy', 'Medium', 'Hard']
 
 export default function ChallengeHistory() {
-  const { history } = useApp()
+  const { history, deleteFromHistory } = useApp()
   const [filter, setFilter] = useState('All')
+  const [deletingId, setDeletingId] = useState(null)
 
   const filtered = filter === 'All' ? history : history.filter(c => c.difficulty === filter)
 
-  const totalXP  = history.reduce((s, c) => s + (c.xp ?? 0), 0)
-  const bestStreak = 9
-  const avgDiff = history.length
-    ? ['Easy','Medium','Hard','Legendary'][
-        Math.round(history.reduce((s, c) => s + ['Easy','Medium','Hard','Legendary'].indexOf(c.difficulty), 0) / history.length)
-      ] ?? 'Hard'
-    : '—'
+  const totalXP = history.reduce((s, c) => s + (c.xp ?? 0), 0)
+
+  async function handleDelete(id) {
+    setDeletingId(id)
+    await deleteFromHistory(id)
+    setDeletingId(null)
+  }
 
   return (
     <Layout>
@@ -29,8 +30,6 @@ export default function ChallengeHistory() {
         {[
           { value: history.length, label: 'Total Completed' },
           { value: totalXP.toLocaleString(), label: 'Total XP Earned' },
-          { value: `${bestStreak} Days`, label: 'Best Streak' },
-          { value: avgDiff, label: 'Avg Difficulty' },
         ].map(s => (
           <div key={s.label} className="stat-card" style={{ padding: '14px 18px' }}>
             <div className="stat-value" style={{ fontSize: 22 }}>{s.value}</div>
@@ -66,6 +65,14 @@ export default function ChallengeHistory() {
               <span style={S.xp}>+{c.xp} XP</span>
               <span style={S.date}>{c.date}</span>
               <span style={S.check}>✓</span>
+              <button
+                onClick={() => handleDelete(c.id ?? i)}
+                disabled={deletingId === (c.id ?? i)}
+                style={S.deleteBtn}
+                title="Delete from history"
+              >
+                <TrashIcon />
+              </button>
             </div>
           ))}
         </div>
@@ -74,8 +81,20 @@ export default function ChallengeHistory() {
   )
 }
 
+function TrashIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3 6 5 6 21 6"/>
+      <path d="M19 6l-1 14H6L5 6"/>
+      <path d="M10 11v6"/>
+      <path d="M14 11v6"/>
+      <path d="M9 6V4h6v2"/>
+    </svg>
+  )
+}
+
 const S = {
-  statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 24 },
+  statsGrid: { display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 12, marginBottom: 24, maxWidth: 400 },
   tabs: { display: 'flex', gap: 4, marginBottom: 20, background: 'var(--bg-card)', borderRadius: 8, padding: 4, alignSelf: 'flex-start', width: 'fit-content' },
   tab: {
     padding: '6px 16px', borderRadius: 6, fontSize: 12, fontWeight: 500,
@@ -98,4 +117,10 @@ const S = {
   xp: { fontSize: 12, fontWeight: 600, color: 'var(--purple-light)', minWidth: 60, textAlign: 'right' },
   date: { fontSize: 12, color: 'var(--text-muted)', minWidth: 80, textAlign: 'right' },
   check: { color: 'var(--easy)', fontSize: 14, flexShrink: 0 },
+  deleteBtn: {
+    background: 'transparent', border: 'none', cursor: 'pointer',
+    color: 'var(--text-dim)', padding: '4px 6px', borderRadius: 6,
+    display: 'flex', alignItems: 'center', flexShrink: 0,
+    transition: 'color .15s, background .15s',
+  },
 }
