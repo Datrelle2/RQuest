@@ -6,7 +6,6 @@ const NAV = [
   { to: '/saved',       label: 'Saved Challenges',   icon: <BookmarkIcon /> },
   { to: '/history',     label: 'Challenge History',  icon: <ClockIcon /> },
   { to: '/settings',    label: 'Category Settings',  icon: <SlidersIcon /> },
-  { to: '/leaderboard', label: 'Leaderboard',        icon: <TrophyIcon /> },
   { to: '/profile',     label: 'Profile',            icon: <UserIcon /> },
 ]
 
@@ -149,9 +148,6 @@ function ClockIcon() {
 }
 function SlidersIcon() {
   return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="6" r="2" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="10" cy="18" r="2" fill="currentColor" stroke="none"/></svg>
-}
-function TrophyIcon() {
-  return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 22v-4h4v4"/><path d="M8 4h8v6a4 4 0 0 1-8 0V4z"/></svg>
 }
 function UserIcon() {
   return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>

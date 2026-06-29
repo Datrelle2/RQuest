@@ -100,17 +100,3 @@ export async function deleteUserData(userId) {
   await supabase.from('profiles').delete().eq('id', userId)
 }
 
-export async function fetchLeaderboard() {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('id, name, total_xp, completed_count')
-    .order('total_xp', { ascending: false })
-    .limit(10)
-  if (error) return []
-  return data.map((u, i) => ({
-    rank: i + 1,
-    name: u.name || 'Anonymous',
-    quests: u.completed_count || 0,
-    points: u.total_xp || 0,
-  }))
-}

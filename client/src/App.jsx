@@ -7,7 +7,6 @@ import Dashboard         from './pages/Dashboard'
 import SavedChallenges   from './pages/SavedChallenges'
 import ChallengeHistory  from './pages/ChallengeHistory'
 import CategorySettings  from './pages/CategorySettings'
-import Leaderboard       from './pages/Leaderboard'
 import Profile           from './pages/Profile'
 import ErrorPage         from './pages/ErrorPage'
 
@@ -42,7 +41,6 @@ function AppRoutes() {
       <Route path="/saved"       element={<Protected><SavedChallenges /></Protected>} />
       <Route path="/history"     element={<Protected><ChallengeHistory /></Protected>} />
       <Route path="/settings"    element={<Protected><CategorySettings /></Protected>} />
-      <Route path="/leaderboard" element={<Protected><Leaderboard /></Protected>} />
       <Route path="/profile"     element={<Protected><Profile /></Protected>} />
       <Route path="/error"       element={<ErrorPage />} />
       <Route path="*"            element={<Navigate to="/" replace />} />

@@ -24,10 +24,14 @@ export function AppProvider({ children }) {
     auth.getSession().then(async session => {
       if (session?.user) {
         const profile = await challengeSvc.fetchUserProfile(session.user.id)
-        const u = profile ?? {
+        const u = {
           id: session.user.id,
-          name: session.user.user_metadata?.name || session.user.email,
-          email: session.user.email,
+          name: profile?.name || session.user.user_metadata?.name || session.user.email,
+          email: profile?.email || session.user.email,
+          totalXP: profile?.totalXP ?? 0,
+          completedCount: profile?.completedCount ?? 0,
+          categories: profile?.categories ?? [],
+          difficulty: profile?.difficulty ?? 'Mixed',
         }
         setUser(u)
         setIsAuthenticated(true)
@@ -69,10 +73,14 @@ export function AppProvider({ children }) {
     try {
       const { user: supaUser } = await auth.signIn(email, password)
       const profile = await challengeSvc.fetchUserProfile(supaUser.id)
-      const u = profile ?? {
+      const u = {
         id: supaUser.id,
-        name: supaUser.user_metadata?.name || supaUser.email,
-        email: supaUser.email,
+        name: profile?.name || supaUser.user_metadata?.name || supaUser.email,
+        email: profile?.email || supaUser.email,
+        totalXP: profile?.totalXP ?? 0,
+        completedCount: profile?.completedCount ?? 0,
+        categories: profile?.categories ?? [],
+        difficulty: profile?.difficulty ?? 'Mixed',
       }
       setUser(u)
       setIsAuthenticated(true)
